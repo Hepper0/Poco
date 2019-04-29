@@ -13,6 +13,7 @@ from .freezeui.utils import create_immutable_hierarchy
 from .utils.track import MotionTrackBatch
 from .utils.multitouch_gesture import make_pinching
 from .gesture import PendingGestureAction
+from airtest.core.helper import G
 
 __author__ = 'lxn3032'
 
@@ -46,7 +47,7 @@ class Poco(PocoAccelerationMixin):
 
         # options
         self._pre_action_wait_for_appearance = options.get('pre_action_wait_for_appearance', 6)
-        self._post_action_interval = options.get('action_interval', 0.8)
+        self._post_action_interval = G.POCO_ACTION_INTERVAL or options.get('action_interval', 0.8)
         self._poll_interval = options.get('poll_interval', 1.44)
         self._reevaluate_volatile_attributes = options.get('reevaluate_volatile_attributes', False)
         if 'touch_down_duration' in options:
