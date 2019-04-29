@@ -1,7 +1,7 @@
 # coding=utf-8
 
 from typing import List, Union, NoReturn, Callable, Any, Text
-
+from airtest.core.helper import G
 from .acceleration import PocoAccelerationMixin
 from .proxy import UIObjectProxy
 from .agent import PocoAgent
@@ -13,7 +13,7 @@ class Poco(PocoAccelerationMixin):
     def __init__(self, agent: PocoAgent, **options) -> Poco:
         self._agent = ...                           # type: PocoAgent
         self._pre_action_wait_for_appearance = 6
-        self._post_action_interval = 0.8
+        self._post_action_interval = G.POCO_ACTION_INTERVAL or 0.8
         self._poll_interval = 1.44
         self._reevaluate_volatile_attributes = False # type: bool
         self._pre_action_callbacks = []             # type: List[Callable[Text, UIObjectProxy, Any]]
