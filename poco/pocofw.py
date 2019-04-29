@@ -47,7 +47,11 @@ class Poco(PocoAccelerationMixin):
 
         # options
         self._pre_action_wait_for_appearance = options.get('pre_action_wait_for_appearance', 6)
-        self._post_action_interval = G.POCO_ACTION_INTERVAL or options.get('action_interval', 0.8)
+        try:
+            self.poco_action_interval = getattr(G,'POCO_ACTION_INTERVAL')
+        except Exception:
+            self.poco_action_interval = None
+        self._post_action_interval = self.poco_action_interval or options.get('action_interval', 0.8)
         self._poll_interval = options.get('poll_interval', 1.44)
         self._reevaluate_volatile_attributes = options.get('reevaluate_volatile_attributes', False)
         if 'touch_down_duration' in options:
