@@ -12,6 +12,7 @@ from .jsonrpc import JSONRPCResponseManager, dispatcher
 from .jsonrpc.jsonrpc2 import JSONRPC20Response
 from .jsonrpc.exceptions import JSONRPCServerError
 from .jsonrpc import six
+from poco.utils.simplerpc.pocofilter import PocoFilter
 
 
 DEBUG = False
@@ -78,11 +79,10 @@ class Callback(object):
                     raise RpcTimeoutError(self)
             else:
                 break
-        return self.result, self.error
+        return (self.result, self.error)
 
     def __str__(self):
-        conn = self.agent.get_connection()
-        return '{} (rid={}) (connection="{}")'.format(repr(self), self.rid, conn)
+        return repr(self) + "(rid=%s)" % self.rid
 
 
 class AsyncResponse(object):
@@ -129,16 +129,26 @@ class RpcAgent(object):
     def call(self, *args, **kwargs):
         raise NotImplementedError
 
-    def get_connection(self):
-        raise NotImplementedError
+    def getFilter(self):
+        filter_dict = {}
+        if PocoFilter.NodeType:
+            filter_dict['NodeType'] = PocoFilter.NodeType
+            filter_dict['SubType'] = PocoFilter.SubType
+            if PocoFilter.Condition:
+                filter_dict = dict(filter_dict, **PocoFilter.Condition)
+            return filter_dict
+        else:
+            return ""
 
     def format_request(self, func, *args, **kwargs):
+        poco_filter = self.getFilter()
         rid = self._id
         payload = {
             "method": func,
             "params": args or kwargs or [],
             "jsonrpc": "2.0",
             "id": rid,
+            "filter": poco_filter,
         }
         self._id = six.text_type(uuid.uuid4())  # prepare next request id
         # send rpc
