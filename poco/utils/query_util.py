@@ -140,6 +140,10 @@ def build_query(name, **attrs):
         if attr_name.lower() == 'NodeFilter'.lower():
             get_node_code(attr_val)
             continue
+            
+        if attr_name == 'index':
+            PocoFilter.Condition[attr_name] = attr_val
+            continue
 
         if not isinstance(attr_val, ComparableTypes):
             raise ValueError('Selector value should be one of the following types "{}". Got {}'
