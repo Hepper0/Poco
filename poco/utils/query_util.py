@@ -127,9 +127,10 @@ def get_node_code(name):
     PocoFilter.SubType = __sub_type[types[1]]
 
 
-def build_query(name, **attrs):
+def build_query(name, poco=None, **attrs):
     query = []
-    init_filter()
+        if type(poco).__name__ == "StdPoco":
+        init_filter()
     if name is not None:
         if not isinstance(name, six.string_types):
             raise ValueError("Name selector should only be string types. Got {}".format(repr(name)))
