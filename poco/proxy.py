@@ -92,7 +92,7 @@ class UIObjectProxy(object):
 
     def __init__(self, poco, name=None, **attrs):
         # query object in tuple
-        self.query = build_query(name, **attrs)
+        self.query = build_query(name, poco **attrs)
         self.poco = poco
 
         # this flag is introduced to improve the performance, it is set if multiple UI elements are selected and
