@@ -4,7 +4,6 @@ from __future__ import unicode_literals
 import poco.utils.six as six
 from poco.utils.simplerpc.pocofilter import *
 
-
 __all__ = ['query_expr']
 
 
@@ -50,21 +49,6 @@ def ensure_text(value):
         return value.decode("utf-8")
     else:
         return value
-
-def getFilter(dictionary):
-    if 'NodeType' in dictionary.keys():
-        PocoFilter.NodeType = dictionary['NodeType']
-        dictionary.__delitem__('NodeType')
-        if 'SubType' in dictionary.keys():
-            PocoFilter.SubType = dictionary['SubType']
-            dictionary.__delitem__('SubType')
-        else:
-            PocoFilter.SubType = '*'
-
-        if dictionary.__len__() > 0:
-            PocoFilter.Condition = dictionary
-    else:
-        raise SyntaxError("Filter is missing NodeType field")
 
 
 def get_node_code(name):
@@ -123,14 +107,21 @@ def get_node_code(name):
         'Boss' : 82
     }
     types = name.split('-')
-    PocoFilter.NodeType = __node_type[types[0]]
-    PocoFilter.SubType = __sub_type[types[1]]
+    # PocoFilter.NodeType = __node_type[types[0]]
+    # PocoFilter.SubType = __sub_type[types[1]]
+    return __node_type[types[0]],__sub_type[types[1]]
 
 
 def build_query(name, poco=None, **attrs):
     query = []
-        if type(poco).__name__ == "StdPoco":
-        init_filter()
+    # std = False
+    filter = PocoFilter()
+    # if type(poco).__name__ == "StdPoco":
+    #     std = True
+    #
+    # if std:
+    #     init_filter()
+
     if name is not None:
         if not isinstance(name, six.string_types):
             raise ValueError("Name selector should only be string types. Got {}".format(repr(name)))
@@ -138,14 +129,19 @@ def build_query(name, poco=None, **attrs):
         attrs['name'] = name
 
     for attr_name, attr_val in attrs.items():
+        # if std:
         if attr_name.lower() == 'NodeFilter'.lower():
-            get_node_code(attr_val)
-            continue
-            
-        if attr_name == 'index':
-            PocoFilter.Condition[attr_name] = attr_val
+            filter.NodeType, filter.SubType = get_node_code(attr_val)
             continue
 
+        if attr_name in ['index','visible']:
+            # PocoFilter.Condition[attr_name] = attr_val
+            filter.Condition[attr_name] = attr_val
+            continue
+
+        # PocoFilter.Condition[attr_name]=attr_val
+        filter.Condition[attr_name] = attr_val
+        local.filter = filter
         if not isinstance(attr_val, ComparableTypes):
             raise ValueError('Selector value should be one of the following types "{}". Got {}'
                              .format(ComparableTypes, type(attr_val)))
@@ -159,6 +155,5 @@ def build_query(name, poco=None, **attrs):
             op = 'attr.*='
         else:
             op = 'attr='
-        PocoFilter.Condition[attr_name]=attr_val
         query.append((op, (attr_name, attr_val)))
     return 'and', tuple(query)
