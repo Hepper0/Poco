@@ -12,7 +12,7 @@ from .jsonrpc import JSONRPCResponseManager, dispatcher
 from .jsonrpc.jsonrpc2 import JSONRPC20Response
 from .jsonrpc.exceptions import JSONRPCServerError
 from .jsonrpc import six
-from poco.utils.simplerpc.pocofilter import PocoFilter
+from poco.utils.simplerpc.pocofilter import *
 
 
 DEBUG = False
@@ -135,13 +135,31 @@ class RpcAgent(object):
             filter_dict['NodeType'] = PocoFilter.NodeType
             filter_dict['SubType'] = PocoFilter.SubType
             if PocoFilter.Condition:
+                if 'visible' not in PocoFilter.Condition.keys():
+                    filter_dict['visible'] = True
                 filter_dict = dict(filter_dict, **PocoFilter.Condition)
             return filter_dict
         else:
             return ""
 
+    def get_filter(self, filter):
+        filter_dict = {}
+        if filter.NodeType:
+            filter_dict['NodeType'] = filter.NodeType
+            filter_dict['SubType'] = filter.SubType
+            if filter.Condition:
+                if 'visible' not in filter.Condition.keys():
+                    filter_dict['visible'] = True
+                filter_dict = dict(filter_dict, **filter.Condition)
+            return filter_dict
+        else:
+            return ""
+
     def format_request(self, func, *args, **kwargs):
-        poco_filter = self.getFilter()
+        # poco_filter = self.getFilter()
+        poco_filter = self.get_filter(local.filter)
+        # print("poco_filter2 : ")
+        # print(poco_filter2)
         rid = self._id
         payload = {
             "method": func,
@@ -169,6 +187,7 @@ class RpcAgent(object):
             # py3里 json 只接受str类型，py2没有这个限制
             msg = msg.decode('utf-8')
         data = json.loads(msg)
+        print(data)
         if DEBUG:
             print("<--", data)
         if "method" in data:
