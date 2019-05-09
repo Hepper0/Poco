@@ -134,7 +134,7 @@ def build_query(name, poco=None, **attrs):
             filter.NodeType, filter.SubType = get_node_code(attr_val)
             continue
 
-        if attr_name in ['index','visible']:
+        if attr_name in ['index','visible','safe']:
             # PocoFilter.Condition[attr_name] = attr_val
             filter.Condition[attr_name] = attr_val
             continue
