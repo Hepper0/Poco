@@ -150,6 +150,8 @@ class RpcAgent(object):
             if filter.Condition:
                 if 'visible' not in filter.Condition.keys():
                     filter_dict['visible'] = True
+                if 'safe' not in PocoFilter.Condition.keys():
+                    filter_dict['safe'] = True   
                 filter_dict = dict(filter_dict, **filter.Condition)
             return filter_dict
         else:
