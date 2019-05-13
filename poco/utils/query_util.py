@@ -114,13 +114,12 @@ def get_node_code(name):
 
 def build_query(name, poco=None, **attrs):
     query = []
-    # std = False
-    filter = PocoFilter()
-    # if type(poco).__name__ == "StdPoco":
-    #     std = True
-    #
-    # if std:
-    #     init_filter()
+    std = False
+
+    if type(poco).__name__ == "StdPoco":
+        std = True
+        filter = PocoFilter()
+        local.filter = filter
 
     if name is not None:
         if not isinstance(name, six.string_types):
@@ -129,19 +128,19 @@ def build_query(name, poco=None, **attrs):
         attrs['name'] = name
 
     for attr_name, attr_val in attrs.items():
-        # if std:
-        if attr_name.lower() == 'NodeFilter'.lower():
-            filter.NodeType, filter.SubType = get_node_code(attr_val)
-            continue
 
-        if attr_name in ['index','visible','safe']:
-            # PocoFilter.Condition[attr_name] = attr_val
+        if std:
+            if attr_name.lower() == 'NodeFilter'.lower():
+                filter.NodeType, filter.SubType = get_node_code(attr_val)
+                continue
+
+            if attr_name in ['index', 'visible', 'safe', 'multi']:
+                filter.Condition[attr_name] = attr_val
+                continue
+
             filter.Condition[attr_name] = attr_val
-            continue
 
-        # PocoFilter.Condition[attr_name]=attr_val
-        filter.Condition[attr_name] = attr_val
-        local.filter = filter
+
         if not isinstance(attr_val, ComparableTypes):
             raise ValueError('Selector value should be one of the following types "{}". Got {}'
                              .format(ComparableTypes, type(attr_val)))
